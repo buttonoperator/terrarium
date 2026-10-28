@@ -8,18 +8,14 @@ log.
 
 ![The terrarium right now](docs/frame.png)
 
-A live viewer lives in [`docs/`](docs/index.html): playback of the last 64
-frames, population and nutrient charts, the mass ledger, the lineage table and
-the chronicle. Run it locally with
+**[Open the live viewer](https://buttonoperator.github.io/terrarium/)** for
+playback of the last 64 frames, population and nutrient charts, the mass
+ledger, the lineage table and the chronicle. It updates whenever the world
+ticks. To run the same page locally:
 
 ```bash
 python -m http.server -d docs 8000
 ```
-
-To publish it, make this repository public and turn on GitHub Pages from the
-`main` branch, `/docs` folder; it will then be served at
-`https://buttonoperator.github.io/terrarium/`. Pages on a private repository
-requires a paid plan.
 
 ## Current state
 
