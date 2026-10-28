@@ -17,17 +17,17 @@ and the chronicle.
 <!-- STATUS:start -->
 | | |
 |---|---|
-| **Tick** | 7224 (day 301, hour 00 of year 6, high summer) |
-| **Temperature** | 21.8 C |
-| **Flora** | 540 (5753 C units, tallest 7.9 tiles) |
-| **Grazers** | 3 (78 C units) |
-| **Predators** | 15 (258 C units) |
-| **Decomposers** | 345 (965 C units) |
-| **Atmosphere** | CO2 9529, vapour 12187, cloud 8236 |
-| **Soil** | 36% saturated, mineral N 1645, litter C 8666 |
+| **Tick** | 7233 (day 301, hour 09 of year 6, high summer) |
+| **Temperature** | 23.7 C |
+| **Flora** | 539 (5550 C units, tallest 7.9 tiles) |
+| **Grazers** | 4 (59 C units) |
+| **Predators** | 15 (257 C units) |
+| **Decomposers** | 345 (942 C units) |
+| **Atmosphere** | CO2 9779, vapour 12058, cloud 7896 |
+| **Soil** | 38% saturated, mineral N 1648, litter C 8673 |
 | **Lineages** | 5 living of 15 ever, 9 recolonisations |
-| **Mass ledger** | C -7.15e-09, N +1.14e-11, H2O +2.29e-09 drift |
-| **Updated** | 2026-10-28 15:14 UTC |
+| **Mass ledger** | C -7.21e-09, N +1.14e-11, H2O +2.33e-09 drift |
+| **Updated** | 2026-10-28 15:20 UTC |
 <!-- STATUS:end -->
 
 ## What is actually simulated
@@ -121,11 +121,11 @@ goes thousands of ticks at a stretch with all four guilds coexisting unaided.
 <!-- LINEAGES:start -->
 | Lineage | Guild | Count | Biomass | Founded (tick) |
 |---|---|---|---|---|
-| Nimune | decomposer | 345 | 965.3 | 2591 |
-| Nimarn | flora | 280 | 2902.8 | 0 |
-| Luniss | flora | 260 | 2850.2 | 0 |
-| Selium | predator | 15 | 258.1 | 6889 |
-| Pyredra | grazer | 3 | 77.6 | 6571 |
+| Nimune | decomposer | 345 | 941.8 | 2591 |
+| Nimarn | flora | 279 | 2788.0 | 0 |
+| Luniss | flora | 260 | 2761.8 | 0 |
+| Selium | predator | 15 | 256.8 | 6889 |
+| Pyredra | grazer | 4 | 58.8 | 6571 |
 <!-- LINEAGES:end -->
 
 ## Graphics

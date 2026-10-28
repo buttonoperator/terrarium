@@ -1,6 +1,6 @@
 # Chronicle
 
-Notable events, newest first. Tick 7224, year 6.
+Notable events, newest first. Tick 7233, year 6.
 
 - **t7200** (year) Year 6 begins; high summer, 21.1 C.
 - **t6889** (recolonisation) Predator guild had died out; Selium arrives from outside with 3 propagules.
