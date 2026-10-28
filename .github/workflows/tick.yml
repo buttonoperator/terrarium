@@ -1,0 +1,65 @@
+name: tick
+
+# Advances the terrarium on a schedule, renders a frame, and commits the new
+# state. This is what makes the world live between visits.
+
+on:
+  schedule:
+    # every three hours; eight runs a day, 72 simulated hours a day
+    - cron: "17 */3 * * *"
+  workflow_dispatch:
+    inputs:
+      ticks:
+        description: "Ticks to advance (1 tick = 1 simulated hour)"
+        required: false
+        default: "9"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: terrarium-tick
+  cancel-in-progress: false
+
+jobs:
+  tick:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Verify invariants
+        run: python -m unittest discover -s tests
+
+      - name: Advance the world
+        run: |
+          TICKS="${{ github.event.inputs.ticks || '9' }}"
+          if [ ! -f state/world.json ]; then
+            echo "No world found; creating one."
+            python -m terrarium new
+          fi
+          python -m terrarium tick --ticks "$TICKS"
+
+      - name: Commit new state
+        run: |
+          git config user.name "terrarium"
+          git config user.email "terrarium@users.noreply.github.com"
+          git add -A state docs README.md
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+            exit 0
+          fi
+          TICK=$(python -c "import json;print(json.load(open('state/world.json'))['tick'])")
+          SUMMARY=$(python -c "
+import json
+s = json.load(open('docs/data/summary.json'))
+p = s['population']
+print('flora %d, grazers %d, predators %d, decomposers %d, %.1fC, %s'
+      % (p['flora'], p['grazer'], p['predator'], p['decomposer'],
+         s['temp'], s['season']))
+")
+          git commit -m "tick $TICK: $SUMMARY"
+          git push

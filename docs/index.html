@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Terrarium</title>
+<style>
+  :root{
+    --bg:#0d1017; --panel:#161b26; --panel-2:#1e2534; --line:#2b3447;
+    --ink:#d7dee9; --dim:#8a97ab;
+    --flora:#6fbf4a; --grazer:#d9b26a; --predator:#c0392b; --decomposer:#9b7fc4;
+    --water:#4a84e0; --n:#e0c468; --litter:#8c5f3f;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font:13px/1.55 ui-monospace,"Cascadia Mono",Consolas,"Courier New",monospace;
+    padding:16px;
+  }
+  .wrap{max-width:1180px;margin:0 auto}
+  h1{font-size:19px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 2px}
+  .sub{color:var(--dim);margin:0 0 16px}
+  .stage{
+    border:2px solid var(--line);background:#000;position:relative;
+    image-rendering:pixelated;line-height:0;
+  }
+  .stage img{width:100%;display:block;image-rendering:pixelated}
+  .hud{
+    position:absolute;left:0;right:0;bottom:0;
+    background:rgba(13,16,23,.82);border-top:2px solid var(--line);
+    padding:6px 10px;line-height:1.5;display:flex;flex-wrap:wrap;gap:4px 18px;
+  }
+  .hud b{color:#fff;font-weight:600}
+  .controls{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:10px 0 20px}
+  button{
+    font:inherit;background:var(--panel-2);color:var(--ink);
+    border:2px solid var(--line);padding:5px 12px;cursor:pointer;
+  }
+  button:hover{background:#2a3244}
+  button:focus-visible{outline:2px solid var(--flora);outline-offset:2px}
+  input[type=range]{flex:1;min-width:180px;accent-color:var(--flora)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px}
+  .card{border:2px solid var(--line);background:var(--panel);padding:12px 14px}
+  .card h2{
+    font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--dim);margin:0 0 10px;font-weight:600;
+  }
+  canvas{width:100%;height:132px;display:block}
+  table{width:100%;border-collapse:collapse;font-size:12px}
+  th,td{text-align:left;padding:3px 6px;border-bottom:1px solid var(--line)}
+  th{color:var(--dim);font-weight:600}
+  td.num{text-align:right;font-variant-numeric:tabular-nums}
+  .dot{display:inline-block;width:8px;height:8px;margin-right:6px;vertical-align:1px}
+  .legend{display:flex;flex-wrap:wrap;gap:12px;color:var(--dim);margin-bottom:8px}
+  .log{max-height:260px;overflow:auto;margin:0;padding:0;list-style:none}
+  .log li{padding:5px 0;border-bottom:1px solid var(--line)}
+  .log .t{color:var(--dim);margin-right:8px}
+  .pools{display:grid;grid-template-columns:1fr auto;gap:2px 10px}
+  .pools span:nth-child(even){text-align:right;font-variant-numeric:tabular-nums}
+  .bar{height:7px;background:var(--panel-2);margin:3px 0 9px;grid-column:1/-1}
+  .bar i{display:block;height:100%}
+  footer{color:var(--dim);margin:22px 0 8px;text-align:center}
+  a{color:var(--flora)}
+  .err{color:#e8657f}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Terrarium</h1>
+  <p class="sub" id="sub">loading state&hellip;</p>
+
+  <div class="stage">
+    <img id="frame" alt="Current state of the terrarium" src="frame.png">
+    <div class="hud" id="hud"></div>
+  </div>
+
+  <div class="controls">
+    <button id="play">&#9654; play</button>
+    <button id="latest">latest</button>
+    <input type="range" id="scrub" min="0" max="0" value="0">
+    <span id="frameLabel" class="sub" style="margin:0"></span>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Populations</h2>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--flora)"></i>flora</span>
+        <span><i class="dot" style="background:var(--grazer)"></i>grazers</span>
+        <span><i class="dot" style="background:var(--predator)"></i>predators</span>
+        <span><i class="dot" style="background:var(--decomposer)"></i>decomposers</span>
+      </div>
+      <canvas id="chartPop"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Nutrient cycle</h2>
+      <div class="legend">
+        <span><i class="dot" style="background:var(--n)"></i>mineral N</span>
+        <span><i class="dot" style="background:var(--litter)"></i>litter C</span>
+        <span><i class="dot" style="background:var(--water)"></i>soil water</span>
+      </div>
+      <canvas id="chartCycle"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Climate</h2>
+      <div class="legend">
+        <span><i class="dot" style="background:#e8657f"></i>temperature</span>
+        <span><i class="dot" style="background:var(--water)"></i>rainfall</span>
+      </div>
+      <canvas id="chartClimate"></canvas>
+    </div>
+
+    <div class="card">
+      <h2>Mass ledger</h2>
+      <div class="pools" id="pools"></div>
+      <p class="sub" style="margin:4px 0 0">
+        Carbon, nitrogen and water are closed. Drift is float rounding only.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Living lineages</h2>
+      <table id="species"><tbody></tbody></table>
+    </div>
+
+    <div class="card">
+      <h2>Chronicle</h2>
+      <ul class="log" id="chronicle"></ul>
+    </div>
+  </div>
+
+  <footer>
+    One tick is one simulated hour. The world advances on a schedule and
+    commits its own state.
+  </footer>
+</div>
+
+<script>
+const KINDS = ["flora", "grazer", "predator", "decomposer"];
+const COLOR = {
+  flora: "#6fbf4a", grazer: "#d9b26a", predator: "#c0392b",
+  decomposer: "#9b7fc4", n: "#e0c468", litter: "#8c5f3f",
+  water: "#4a84e0", temp: "#e8657f"
+};
+
+const $ = id => document.getElementById(id);
+const fmt = n => n === undefined || n === null ? "-" :
+  (Math.abs(n) >= 1000 ? Math.round(n).toLocaleString() :
+   Math.round(n * 10) / 10);
+
+let summary = null, history = [], frames = [], cursor = 0, timer = null;
+
+async function getJSON(path) {
+  const r = await fetch(path + "?v=" + Date.now());
+  if (!r.ok) throw new Error(path + " -> " + r.status);
+  return r.json();
+}
+
+async function boot() {
+  try {
+    [summary, history, frames] = await Promise.all([
+      getJSON("data/summary.json"),
+      getJSON("data/history.json"),
+      getJSON("data/frames.json")
+    ]);
+  } catch (err) {
+    $("sub").innerHTML = '<span class="err">Could not load state: ' +
+      err.message + '</span>';
+    return;
+  }
+  const chronicle = await getJSON("data/chronicle.json").catch(() => []);
+
+  $("sub").textContent =
+    "seed " + summary.seed + " · tick " + summary.tick.toLocaleString() +
+    " · day " + summary.day + " of year " + summary.year +
+    " · " + summary.season + " · updated " + summary.updated;
+
+  renderHUD();
+  renderPools();
+  renderSpecies();
+  renderChronicle(chronicle);
+  drawAll();
+
+  cursor = frames.length - 1;
+  $("scrub").max = Math.max(0, frames.length - 1);
+  $("scrub").value = cursor;
+  showFrame(cursor, true);
+  window.addEventListener("resize", drawAll);
+}
+
+function renderHUD() {
+  const p = summary.population, b = summary.biomass;
+  const cell = (label, value, colour) =>
+    '<span>' + (colour ? '<i class="dot" style="background:' + colour + '"></i>' : '') +
+    label + ' <b>' + value + '</b></span>';
+  $("hud").innerHTML =
+    cell("flora", p.flora, COLOR.flora) +
+    cell("grazers", p.grazer, COLOR.grazer) +
+    cell("predators", p.predator, COLOR.predator) +
+    cell("decomposers", p.decomposer, COLOR.decomposer) +
+    cell("temp", fmt(summary.temp) + "°C") +
+    cell("soil", Math.round(summary.soil.saturation * 100) + "%") +
+    cell("biomass", fmt(KINDS.reduce((s, k) => s + b[k], 0))) +
+    cell("lineages", summary.species_alive);
+}
+
+function renderPools() {
+  const s = summary, total = s.ledger;
+  const rows = [
+    ["atmospheric CO2", s.air.co2, COLOR.litter, s.air.co2 / total.carbon.expected],
+    ["living biomass", KINDS.reduce((a, k) => a + s.biomass[k], 0), COLOR.flora,
+      KINDS.reduce((a, k) => a + s.biomass[k], 0) / total.carbon.expected],
+    ["soil litter C", s.soil.detritus_c, COLOR.litter,
+      s.soil.detritus_c / total.carbon.expected],
+    ["mineral N", s.soil.mineral_n, COLOR.n,
+      s.soil.mineral_n / total.nitrogen.expected],
+    ["soil water", s.soil.water, COLOR.water,
+      s.soil.water / total.water.expected],
+    ["atmospheric vapour", s.air.humidity, COLOR.water,
+      s.air.humidity / total.water.expected]
+  ];
+  let html = "";
+  for (const [label, value, colour, frac] of rows) {
+    html += "<span>" + label + "</span><span>" + fmt(value) + "</span>" +
+      '<span class="bar"><i style="width:' +
+      (Math.max(0, Math.min(1, frac)) * 100).toFixed(1) +
+      '%;background:' + colour + '"></i></span>';
+  }
+  html += "<span>drift (C / N / H2O)</span><span>" +
+    total.carbon.drift.toExponential(1) + " / " +
+    total.nitrogen.drift.toExponential(1) + " / " +
+    total.water.drift.toExponential(1) + "</span>";
+  $("pools").innerHTML = html;
+}
+
+function renderSpecies() {
+  const rows = summary.species.slice(0, 12).map(sp =>
+    "<tr><td><i class='dot' style='background:" + COLOR[sp.kind] + "'></i>" +
+    sp.name + "</td><td>" + sp.kind + "</td>" +
+    "<td class='num'>" + sp.count + "</td>" +
+    "<td class='num'>" + fmt(sp.biomass) + "</td>" +
+    "<td class='num'>t" + sp.founded + "</td></tr>").join("");
+  $("species").innerHTML =
+    "<thead><tr><th>lineage</th><th>guild</th><th class='num'>n</th>" +
+    "<th class='num'>biomass</th><th class='num'>founded</th></tr></thead>" +
+    "<tbody>" + rows + "</tbody>";
+}
+
+function renderChronicle(entries) {
+  $("chronicle").innerHTML = entries.slice().reverse().map(e =>
+    '<li><span class="t">t' + e.tick + '</span>' + escapeHTML(e.text) + '</li>'
+  ).join("") || "<li>nothing recorded yet</li>";
+}
+
+function escapeHTML(s) {
+  return String(s).replace(/[&<>"']/g, c => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[c]));
+}
+
+// --- charts ---------------------------------------------------------------
+
+function setupCanvas(cv) {
+  const dpr = window.devicePixelRatio || 1;
+  const r = cv.getBoundingClientRect();
+  cv.width = Math.max(1, Math.floor(r.width * dpr));
+  cv.height = Math.max(1, Math.floor(r.height * dpr));
+  const ctx = cv.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, r.width, r.height);
+  return { ctx, w: r.width, h: r.height };
+}
+
+function plot(cv, series) {
+  const { ctx, w, h } = setupCanvas(cv);
+  if (!history.length) return;
+  const pad = 4;
+  let max = 0;
+  for (const s of series) for (const v of s.values) if (v > max) max = v;
+  max = max || 1;
+
+  ctx.strokeStyle = "#2b3447";
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 3; i++) {
+    const y = pad + (h - pad * 2) * i / 3;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+  }
+
+  for (const s of series) {
+    const n = s.values.length;
+    ctx.beginPath();
+    for (let i = 0; i < n; i++) {
+      const x = n === 1 ? w : (i / (n - 1)) * w;
+      const y = h - pad - (s.values[i] / max) * (h - pad * 2);
+      i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+    }
+    ctx.strokeStyle = s.colour;
+    ctx.lineWidth = 1.6;
+    ctx.stroke();
+  }
+
+  ctx.fillStyle = "#8a97ab";
+  ctx.font = "10px ui-monospace,Consolas,monospace";
+  ctx.fillText(fmt(max), 3, 11);
+}
+
+function drawAll() {
+  const col = key => history.map(h => h.pop[key]);
+  plot($("chartPop"), KINDS.map(k => ({ values: col(k), colour: COLOR[k] })));
+  plot($("chartCycle"), [
+    { values: history.map(h => h.mineral_n), colour: COLOR.n },
+    { values: history.map(h => h.detritus_c), colour: COLOR.litter },
+    { values: history.map(h => h.soil_water), colour: COLOR.water }
+  ]);
+  const lo = Math.min(...history.map(h => h.temp), 0);
+  plot($("chartClimate"), [
+    { values: history.map(h => h.temp - lo), colour: COLOR.temp },
+    { values: history.map(h => h.rain), colour: COLOR.water }
+  ]);
+}
+
+// --- playback -------------------------------------------------------------
+
+function showFrame(i, immediate) {
+  if (!frames.length) return;
+  cursor = Math.max(0, Math.min(frames.length - 1, i));
+  const f = frames[cursor];
+  $("frame").src = (cursor === frames.length - 1 && immediate)
+    ? "frame.png?v=" + Date.now()
+    : "frames/" + f.file;
+  $("scrub").value = cursor;
+  $("frameLabel").textContent =
+    "tick " + f.tick.toLocaleString() +
+    "  (" + (cursor + 1) + "/" + frames.length + ")";
+}
+
+$("scrub").addEventListener("input", e => { stop(); showFrame(+e.target.value); });
+$("latest").addEventListener("click", () => {
+  stop(); showFrame(frames.length - 1, true);
+});
+$("play").addEventListener("click", () => timer ? stop() : start());
+
+function start() {
+  if (frames.length < 2) return;
+  $("play").innerHTML = "&#9208; pause";
+  timer = setInterval(() => {
+    showFrame(cursor >= frames.length - 1 ? 0 : cursor + 1);
+  }, 320);
+}
+function stop() {
+  clearInterval(timer); timer = null;
+  $("play").innerHTML = "&#9654; play";
+}
+
+boot();
+</script>
+</body>
+</html>
