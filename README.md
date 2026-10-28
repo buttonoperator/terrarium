@@ -8,9 +8,18 @@ log.
 
 ![The terrarium right now](docs/frame.png)
 
-**[Open the live viewer](https://buttonoperator.github.io/terrarium/)** for
-playback of recent frames, population and nutrient charts, the lineage table,
-and the chronicle.
+A live viewer lives in [`docs/`](docs/index.html): playback of the last 64
+frames, population and nutrient charts, the mass ledger, the lineage table and
+the chronicle. Run it locally with
+
+```bash
+python -m http.server -d docs 8000
+```
+
+To publish it, make this repository public and turn on GitHub Pages from the
+`main` branch, `/docs` folder; it will then be served at
+`https://buttonoperator.github.io/terrarium/`. Pages on a private repository
+requires a paid plan.
 
 ## Current state
 
@@ -190,6 +199,17 @@ world replays identically from its seed and tick count.
 To change the pace, edit the cron expression or the `ticks` input. To start
 over, delete `state/` and run `new` with a different seed; the chronicle and the
 commit history of the old world remain.
+
+**On repository growth.** The state is rewritten every run, so each commit
+stores a fresh copy: roughly 1.2 MB of JSON plus one 25 kB frame, which packs
+down to a few hundred kilobytes. At eight runs a day that is on the order of a
+gigabyte a year. Genomes are stored as ordered value lists rather than
+key/value maps, history is sampled every twelfth tick and capped, and the frame
+archive is pruned to 64, which together cut the payload by about two thirds.
+If the history ever becomes a problem, squash it: the world only needs
+`state/world.json` to continue, and `state/CHRONICLE.md` keeps the narrative.
+Note that GitHub disables scheduled workflows on repositories with no activity
+for 60 days, which a self-committing repository avoids by construction.
 
 ## Licence
 
