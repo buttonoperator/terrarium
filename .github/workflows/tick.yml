@@ -52,14 +52,6 @@ jobs:
             echo "Nothing changed."
             exit 0
           fi
-          TICK=$(python -c "import json;print(json.load(open('state/world.json'))['tick'])")
-          SUMMARY=$(python -c "
-import json
-s = json.load(open('docs/data/summary.json'))
-p = s['population']
-print('flora %d, grazers %d, predators %d, decomposers %d, %.1fC, %s'
-      % (p['flora'], p['grazer'], p['predator'], p['decomposer'],
-         s['temp'], s['season']))
-")
-          git commit -m "tick $TICK: $SUMMARY"
+          MSG=$(python -c "import json; s=json.load(open('docs/data/summary.json')); p=s['population']; print('tick %d: flora %d, grazers %d, predators %d, decomposers %d, %.1fC, %s' % (s['tick'], p['flora'], p['grazer'], p['predator'], p['decomposer'], s['temp'], s['season']))")
+          git commit -m "$MSG"
           git push
