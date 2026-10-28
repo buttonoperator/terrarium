@@ -204,8 +204,12 @@ key/value maps, history is sampled every twelfth tick and capped, and the frame
 archive is pruned to 64, which together cut the payload by about two thirds.
 If the history ever becomes a problem, squash it: the world only needs
 `state/world.json` to continue, and `state/CHRONICLE.md` keeps the narrative.
-Note that GitHub disables scheduled workflows on repositories with no activity
-for 60 days, which a self-committing repository avoids by construction.
+**On staying scheduled.** GitHub disables cron workflows on repositories with
+no activity for 60 days. Commits pushed by the workflow's own `GITHUB_TOKEN`
+do not retrigger workflows and should not be relied on to count as activity, so
+if the terrarium ever goes quiet, check the Actions tab and re-enable the
+schedule, or push a commit by hand. Running the workflow manually from the
+Actions tab also advances the world.
 
 ## Licence
 
