@@ -1,6 +1,6 @@
 # Chronicle
 
-Notable events, newest first. Tick 7314, year 6.
+Notable events, newest first. Tick 7323, year 6.
 
 - **t7250** (recolonisation) Grazer guild had died out; Aldeia arrives from outside with 14 propagules.
 - **t7200** (year) Year 6 begins; high summer, 21.1 C.
