@@ -22,17 +22,17 @@ python -m http.server -d docs 8000
 <!-- STATUS:start -->
 | | |
 |---|---|
-| **Tick** | 7548 (day 314, hour 12 of year 6, high summer) |
-| **Temperature** | 14.3 C |
-| **Flora** | 502 (6377 C units, tallest 7.8 tiles) |
+| **Tick** | 7557 (day 314, hour 21 of year 6, high summer) |
+| **Temperature** | 10.2 C |
+| **Flora** | 503 (6459 C units, tallest 7.9 tiles) |
 | **Grazers** | 0 (0 C units) |
-| **Predators** | 8 (46 C units) |
-| **Decomposers** | 346 (864 C units) |
-| **Atmosphere** | CO2 8622, vapour 7575, cloud 7760 |
-| **Soil** | 47% saturated, mineral N 1584, litter C 9575 |
+| **Predators** | 7 (39 C units) |
+| **Decomposers** | 342 (880 C units) |
+| **Atmosphere** | CO2 8472, vapour 6795, cloud 8360 |
+| **Soil** | 47% saturated, mineral N 1579, litter C 9637 |
 | **Lineages** | 4 living of 16 ever, 10 recolonisations |
-| **Mass ledger** | C -7.49e-09, N +8.19e-12, H2O +2.15e-09 drift |
-| **Updated** | 2026-11-08 10:23 UTC |
+| **Mass ledger** | C -7.44e-09, N +8.19e-12, H2O +2.31e-09 drift |
+| **Updated** | 2026-11-08 17:56 UTC |
 <!-- STATUS:end -->
 
 ## What is actually simulated
@@ -126,10 +126,10 @@ goes thousands of ticks at a stretch with all four guilds coexisting unaided.
 <!-- LINEAGES:start -->
 | Lineage | Guild | Count | Biomass | Founded (tick) |
 |---|---|---|---|---|
-| Nimune | decomposer | 346 | 863.5 | 2591 |
-| Luniss | flora | 262 | 2895.6 | 0 |
-| Nimarn | flora | 240 | 3481.2 | 0 |
-| Selium | predator | 8 | 45.5 | 6889 |
+| Nimune | decomposer | 342 | 879.8 | 2591 |
+| Luniss | flora | 264 | 2972.9 | 0 |
+| Nimarn | flora | 239 | 3486.2 | 0 |
+| Selium | predator | 7 | 38.8 | 6889 |
 <!-- LINEAGES:end -->
 
 ## Graphics
