@@ -1,6 +1,6 @@
 # Chronicle
 
-Notable events, newest first. Tick 7629, year 6.
+Notable events, newest first. Tick 7638, year 6.
 
 - **t7610** (recolonisation) Grazer guild had died out; Lunola arrives from outside with 14 propagules.
 - **t7250** (recolonisation) Grazer guild had died out; Aldeia arrives from outside with 14 propagules.
