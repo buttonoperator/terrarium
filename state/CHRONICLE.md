@@ -1,7 +1,8 @@
 # Chronicle
 
-Notable events, newest first. Tick 7962, year 6.
+Notable events, newest first. Tick 7971, year 6.
 
+- **t7970** (recolonisation) Grazer guild had died out; Vesiva arrives from outside with 14 propagules.
 - **t7610** (recolonisation) Grazer guild had died out; Lunola arrives from outside with 14 propagules.
 - **t7250** (recolonisation) Grazer guild had died out; Aldeia arrives from outside with 14 propagules.
 - **t7200** (year) Year 6 begins; high summer, 21.1 C.
