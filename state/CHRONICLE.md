@@ -1,6 +1,6 @@
 # Chronicle
 
-Notable events, newest first. Tick 8025, year 6.
+Notable events, newest first. Tick 8034, year 6.
 
 - **t7970** (recolonisation) Grazer guild had died out; Vesiva arrives from outside with 14 propagules.
 - **t7610** (recolonisation) Grazer guild had died out; Lunola arrives from outside with 14 propagules.
